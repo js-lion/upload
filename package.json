@@ -1,0 +1,47 @@
+{
+  "name": "@js-lion/upload",
+  "private": true,
+  "version": "0.1.1",
+  "description": "文件上传",
+  "type": "module",
+  "main": "dist/upload.js",
+  "types": "types/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "postbuild": "npm run types",
+    "preview": "vite preview",
+    "types": "node scripts/types.cjs"
+  },
+  "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
+    "@aws-sdk/client-s3": "^3.614.0",
+    "@aws-sdk/lib-storage": "^3.614.0",
+    "@aws-sdk/s3-request-presigner": "^3.614.0",
+    "@fengqiaogang/safe-get": "^0.1.4",
+    "ant-design-vue": "^4.2.3"
+  },
+  "devDependencies": {
+    "vue": "^3.4.29",
+    "shelljs": "^0.8.5",
+    "@types/uuid": "^10.0.0",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "axios": "^1.7.2",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1",
+    "vue-tsc": "^2.0.21"
+  },
+  "peerDependencies": {
+    "uuid": "^10.0.0",
+    "vue": "^3.4.29"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "types/",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ]
+}
