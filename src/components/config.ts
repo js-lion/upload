@@ -2,6 +2,7 @@ import * as _ from "../util/index";
 import S3Client from "../util/upload/s3";
 import acceptVerification from "./accept";
 import type {AcceptFun} from "./accept";
+import type {ChangeCallback} from "../util/upload/s3";
 
 interface Config {
   multiple?: boolean;          // 是否多选，默认单选
@@ -25,7 +26,7 @@ export const getAcceptValue = function (value: string | AcceptFun) {
 }
 
 // 上传文件
-export const onUploadFile = async function (config: Config, files: File[]) {
+export const onUploadFile = async function (config: Config, files: File[], onChange: ChangeCallback) {
   // 判断文件数量
   if (config.limit && config.limit > 0) {
     if (config.limit < files.length) {
@@ -62,8 +63,6 @@ export const onUploadFile = async function (config: Config, files: File[]) {
 
   // 文件开始上传
   const client = new S3Client(files);
-  client.on(function (file: File, progress: number) {
-    console.log(progress, file.name);
-  });
+  client.on(onChange);
   return await client.start();
 }

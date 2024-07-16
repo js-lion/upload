@@ -26,10 +26,11 @@ class FileChunk {
 }
 
 const getFileMeta = function (file: File) {
+  const name: string = encodeURIComponent(file.name);
   return {
     // 文件基础信息
     // Key Value 均为 String 类型
-    name: String(file.name),                 // 名称
+    name,                 // 名称
     size: String(file.size),                 // 大小
     type: String(file.type),                 // 类型
     lastmodified: String(file.lastModified), // 最后修改时间
@@ -44,7 +45,8 @@ const fileMd5 = function (file: File): string {
 
 const filePath = function (file: File): string {
   const md5: string = fileMd5(file);
-  return `${md5}/${file.name}`;
+  const name: string = encodeURIComponent(file.name);
+  return `${md5}/${name}`;
 }
 
 export default class Client extends S3Client {
@@ -105,7 +107,7 @@ export default class Client extends S3Client {
       // 直接返回文件信息
       return hasValue;
     }
-    const upload: Upload = new Upload({
+    const http: Upload = new Upload({
       client: this,
       params: {
         Key: path,
@@ -117,7 +119,7 @@ export default class Client extends S3Client {
       }
     });
     try {
-      const res = await upload.done();
+      const res = await http.done();
       const ETag = safeGet<string>(res, "ETag");
       const value = new Result(file, path, ETag);
       this.onChange(file, 100, value);
@@ -201,16 +203,16 @@ export default class Client extends S3Client {
 
   // 大文件切分片上传
   async multipartUpload(file: File) {
+    const size = file.size;
+    if (size <= this.chunkSize) {
+      return this.simpleUpload(file);
+    }
     const path: string = filePath(file);
     // 判断文件是否已上传
     const hasValue = await this.hasObject(file, path);
     if (hasValue) {
       // 直接返回文件信息
       return hasValue;
-    }
-    const size = file.size;
-    if (size <= this.chunkSize) {
-      return this.simpleUpload(file);
     }
 
     this.onChange(file, 0);

@@ -23,7 +23,6 @@ export default defineConfig({
       external: [
         /^vue/i,
         /^uuid/i,
-        /^@aws-sdk/i,
       ],
       output: {
         inlineDynamicImports: true

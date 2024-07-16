@@ -14,7 +14,7 @@ import type {PropType} from "vue";
 import type {AcceptFun} from "./accept";
 import type {Result} from "../util/upload/res";
 
-const $emit = defineEmits(["success", "update:loading"]);
+const $emit = defineEmits(["success", "update:loading", "change"]);
 const props = defineProps({
   // 是否多选，默认单选
   multiple: {
@@ -62,10 +62,14 @@ const fileRef = ref();
 const dragenter = ref(false);
 const uuid = ref<number>(Math.random());
 
+const onChange = function (file: File, progress: number, data?: Result) {
+  $emit("change", file, progress, data);
+}
+
 const onUpload = async function (value: File[]) {
   $emit("update:loading", true);
   try {
-    const res: Result[] = await onUploadFile(props, value);
+    const res: Result[] = await onUploadFile(props, value, onChange);
     $emit("success", res);
   } catch (e) {
     // todo
