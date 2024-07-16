@@ -1,6 +1,6 @@
 {
   "name": "@js-lion/upload",
-  "private": true,
+  "private": false,
   "version": "0.1.1",
   "description": "文件上传",
   "type": "module",
