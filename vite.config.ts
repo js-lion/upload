@@ -22,6 +22,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
         /^vue/i,
+        /^uuid/i,
         /^@aws-sdk/i,
       ],
       output: {
