@@ -10,7 +10,6 @@ export class Result {
   type: string;
   name: string;
   path?: string;
-  url?: string;
   ETag?: string;
   status: Status;
 
@@ -23,10 +22,8 @@ export class Result {
 
     if (path && /^\//.test(path)) {
       this.path = path;
-      this.url = `https://file.jyjs.xyz${path}`;
     } else if (path) {
       this.path = `/${path}`;
-      this.url = `https://file.jyjs.xyz/${path}`;
     }
   }
 }
