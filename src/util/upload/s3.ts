@@ -56,7 +56,7 @@ export default class Client extends S3Client {
 
   private event = new Set<ChangeCallback>();
 
-  constructor(files: File[]) {
+  constructor(public Bucket: string, files: File[]) {
     const config = {
       region: R2Config.region,
       endpoint: R2Config.host,
@@ -86,7 +86,7 @@ export default class Client extends S3Client {
     try {
       const command = new HeadObjectCommand({
         Key: path,
-        Bucket: R2Config.Bucket,
+        Bucket: this.Bucket,
       });
       const res = await this.send(command);
       const ETag = safeGet<string>(res, "ETag");
@@ -114,7 +114,7 @@ export default class Client extends S3Client {
         Body: file,
         ContentType: file.type,
         ContentLength: file.size,
-        Bucket: R2Config.Bucket,
+        Bucket: this.Bucket,
         Metadata: getFileMeta(file),
       }
     });
@@ -136,7 +136,7 @@ export default class Client extends S3Client {
   private async getClient(file: File, path: string = filePath(file)) {
     const command = new CreateMultipartUploadCommand({
       Key: path,
-      Bucket: R2Config.Bucket,
+      Bucket: this.Bucket,
       ContentType: file.type,
       Metadata: getFileMeta(file),
     });
@@ -159,7 +159,7 @@ export default class Client extends S3Client {
       url: (partNumber: number) => {
         const part = new UploadPartCommand({
           Key: path,
-          Bucket: R2Config.Bucket,
+          Bucket: this.Bucket,
           UploadId: box.UploadId,
           PartNumber: partNumber
         });
@@ -174,7 +174,7 @@ export default class Client extends S3Client {
         });
         const command = new CompleteMultipartUploadCommand({
           Key: path,
-          Bucket: R2Config.Bucket,
+          Bucket: this.Bucket,
           UploadId: box.UploadId,
           MultipartUpload: {Parts: list},
         });
@@ -187,7 +187,7 @@ export default class Client extends S3Client {
           Body: value,
           UploadId: box.UploadId,
           PartNumber: item.index,
-          Bucket: R2Config.Bucket
+          Bucket: this.Bucket
         });
         try {
           const res = await this.send(commandChunk);

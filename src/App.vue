@@ -3,5 +3,5 @@ import Upload from "./components/upload.vue";
 </script>
 
 <template>
-  <Upload :disabled="false" :multiple="true" :drag="true"></Upload>
+  <Upload :disabled="false" :multiple="true" :drag="true" bucket="ecigame"></Upload>
 </template>

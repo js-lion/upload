@@ -9,6 +9,7 @@ interface Config {
   accept?: string | AcceptFun;  // 文件格式限制
   maxSize: number;             // 单个文件大小限制, 单位 M
   limit: number;               // 单次允许上传的文件数量上限
+  bucket: string;              // 存储桶的名称
 }
 
 export const getAcceptValue = function (value: string | AcceptFun) {
@@ -27,6 +28,9 @@ export const getAcceptValue = function (value: string | AcceptFun) {
 
 // 上传文件
 export const onUploadFile = async function (config: Config, files: File[], onChange: ChangeCallback) {
+  if (!config.bucket) {
+    return Promise.reject({type: "bucket"});
+  }
   // 判断文件数量
   if (config.limit && config.limit > 0) {
     if (config.limit < files.length) {
@@ -62,7 +66,7 @@ export const onUploadFile = async function (config: Config, files: File[], onCha
   }
 
   // 文件开始上传
-  const client = new S3Client(files);
+  const client = new S3Client(config.bucket, files);
   client.on(onChange);
   return await client.start();
 }

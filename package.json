@@ -1,6 +1,6 @@
 {
   "name": "@js-lion/upload",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "description": "文件上传",
   "type": "module",
   "main": "dist/upload.js",
@@ -39,7 +39,6 @@
   },
   "files": [
     "dist/",
-    "src/",
     "types/",
     "LICENSE",
     "README.md",

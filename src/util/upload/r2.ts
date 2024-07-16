@@ -9,10 +9,9 @@
 
 // export const accountId: string = "be9673e066773ba239c31b3befeaa983";
 
-export const Bucket: string = "file";
-export const accountId: string = "be9673e066773ba239c31b3befeaa983";
+export const accountId: string = "0d184dbcc6bb255da623ef5440e34334";
 
 export const region: string = "APAC";
 export const host: string = `https://${accountId}.r2.cloudflarestorage.com`;
-export const accessKey: string = "1ea3da8d2ae7e6e77acd1f713e64382c";
-export const secretKey: string = "fd262505de1dd221ca6ec1df6d9700ca934f2a78765d8a96e89043b6d1a34e8f";
+export const accessKey: string = "82a23b12bcdf932c22ba3ef8334bb8aa";
+export const secretKey: string = "0f6bb4970e39d389fb30c390da212ba2b38ad4cf208d1e5be94f827006fe9262";

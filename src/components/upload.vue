@@ -14,7 +14,7 @@ import type {PropType} from "vue";
 import type {AcceptFun} from "./accept";
 import type {Result} from "../util/upload/res";
 
-const $emit = defineEmits(["success", "update:loading", "change"]);
+const $emit = defineEmits(["success", "update:loading", "change", "abnormal"]);
 const props = defineProps({
   // 是否多选，默认单选
   multiple: {
@@ -55,6 +55,10 @@ const props = defineProps({
     type: Number,
     required: false,
     default: () => 0, // 0 表示无限制
+  },
+  bucket: {
+    type: String,
+    required: true,
   }
 })
 
@@ -72,7 +76,8 @@ const onUpload = async function (value: File[]) {
     const res: Result[] = await onUploadFile(props, value, onChange);
     $emit("success", res);
   } catch (e) {
-    // todo
+    // 异常
+    $emit("abnormal", e);
   }
   uuid.value = Math.random();
   setTimeout(function () {
