@@ -21,9 +21,9 @@ export class Result {
     this.status = status;
 
     if (path && /^\//.test(path)) {
-      this.path = `${path}?name=${encodeURIComponent(file.name)}`;
+      this.path = path;
     } else if (path) {
-      this.path = `/${path}?name=${encodeURIComponent(file.name)}`;
+      this.path = `/${path}`;
     }
   }
 }

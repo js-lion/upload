@@ -52,6 +52,13 @@ const filePath = function (file: File): string {
   return `${md5}/${name}.${suffix}`;
 }
 
+const getContentDisposition = function (file: File) {
+  if (file && file.name) {
+    return `attachment; filename="${encodeURIComponent(decodeURIComponent(file.name))}"`
+  }
+  return "attachment";
+}
+
 export default class Client extends S3Client {
   private readonly files: File[] = [];        // 需要上传的文件列表
   public chunkSize: number = 5 * 1024 * 1024; // 切片大小
@@ -117,6 +124,7 @@ export default class Client extends S3Client {
         Body: file,
         ContentType: file.type,
         ContentLength: file.size,
+        ContentDisposition: getContentDisposition(file),
         Bucket: this.Bucket,
         Metadata: getFileMeta(file),
       }
@@ -141,6 +149,7 @@ export default class Client extends S3Client {
       Key: path,
       Bucket: this.Bucket,
       ContentType: file.type,
+      ContentDisposition: getContentDisposition(file),
       Metadata: getFileMeta(file),
     });
     // 创建临时的切片文件上传空间
