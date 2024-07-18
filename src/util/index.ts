@@ -1,6 +1,10 @@
 import {v1 as uuidV1, v4 as uuidV4, v5 as uuidV5} from "uuid";
 
 
+export const MD5 = function (value: string): string {
+  return uuidV5(value, uuidV5.URL).replace(/-/ig, "");
+};
+
 // 生成唯一值
 export const UUID = function () {
   let value;

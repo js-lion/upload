@@ -4,6 +4,7 @@
  */
 
 import * as _ from "../index";
+// @ts-ignore
 import * as R2Config from "./r2";
 import {Result, Status} from "./res";
 
@@ -45,8 +46,11 @@ const fileMd5 = function (file: File): string {
 
 const filePath = function (file: File): string {
   const md5: string = fileMd5(file);
-  const name: string = encodeURIComponent(file.name);
-  return `${md5}/${name}`;
+  const name = _.MD5(file.name);
+  const index = file.name.lastIndexOf(".");
+  const suffix = file.name.slice(index + 1);
+  console.log(file.name, suffix);
+  return `${md5}/${name}.${suffix}`;
 }
 
 export default class Client extends S3Client {
@@ -221,43 +225,49 @@ export default class Client extends S3Client {
     const client = await this.getClient(file, path);
     const chunkList = client.chunks();
 
-    let abnormalCount: number = 3;
     const batchUpload = async (tasks: FileChunk[]) => {
+      const executing = new Set();
       const abnormal: FileChunk[] = [];  // 记录上传失败的切片
-      for (const list of _.chunk(tasks, this.chunkCount)) {
-        const app = async (item: FileChunk) => {
-          try {
-            const value = await client.upload(item);
-            result.push(value);
-            const progress = (result.length / chunkList.length * 100).toFixed(2);
-            this.onChange(file, Number(progress));
-          } catch (e) {
-            abnormal.push(item); // 记录
-          }
-          return void 0;
+
+      // 定义一个函数来处理单个任务
+      const enqueue = async (task: FileChunk) => {
+        // 开始处理任务，并将Promise添加到执行集合
+        const p = client.upload(task).then(value => {
+          result.push(value);
+          const progress = (result.length / chunkList.length * 100).toFixed(2);
+          this.onChange(file, Number(progress));
+        });
+        executing.add(p); // 将任务添加到执行集合
+        p.catch(() => abnormal.push(task));
+        p.finally(() => executing.delete(p));
+
+        // 如果当前正在执行的任务数达到并行限制，等待任意一个任务完成
+        if (executing.size >= this.chunkCount) {
+          await Promise.race(executing);
         }
-        await Promise.all(list.map(app));
+      };
+      // 遍历所有任务，依次开始处理
+      for (const task of tasks) {
+        await enqueue(task);
       }
-      if (abnormal.length > 0 && abnormalCount > 0) {
-        abnormalCount -= 1;
-        // 如果有异常，则重新上传
+      // 等待所有任务完成
+      while (executing.size > 0) {
+        await Promise.race(executing);
+      }
+      if (abnormal.length > 0) {
         return batchUpload(abnormal);
       }
-      // 如果记录的异常情况数量大于 0，则表示为上传失败
-      return abnormal.length <= 0;
     }
     // 开始批量上传
-    const status = await batchUpload(chunkList);
-    if (status) {
-      try {
-        await client.merge(result);
-        const res = new Result(file, path);
-        this.onChange(file, 100, res);
-      } catch (e) {
-        return Promise.reject(e);
-      }
+    await batchUpload(chunkList);
+    try {
+      await client.merge(result);
+      const res = new Result(file, path);
+      this.onChange(file, 100, res);
+      return res;
+    } catch (e) {
+      return Promise.reject(e);
     }
-    return Promise.reject(new Error("Upload Error"));
   }
 
   async start() {
