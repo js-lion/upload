@@ -46,10 +46,9 @@ const fileMd5 = function (file: File): string {
 
 const filePath = function (file: File): string {
   const md5: string = fileMd5(file);
-  const name = _.MD5(file.name);
-  const index = file.name.lastIndexOf(".");
-  const suffix = file.name.slice(index + 1);
-  console.log(file.name, suffix);
+  const name: string = _.MD5(file.name);
+  const index: number = file.name.lastIndexOf(".");
+  const suffix: string = file.name.slice(index + 1);
   return `${md5}/${name}.${suffix}`;
 }
 
